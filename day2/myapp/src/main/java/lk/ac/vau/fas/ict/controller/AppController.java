@@ -82,15 +82,33 @@ public class AppController {
 	}
 	
 	//find the students who's age is between 20 and 23
-	@GetMapping("/students/{ag}")
-	public Student getStudentsByAge(@PathVariable("ag") int age) {
-		for(Student student : students) 
-		if(student.getAge().equals(age)) {
-			return student;
-		}
-		return null;
+	@GetMapping("/students/age")
+    public List<Student> getStudentsByAge() {
+        List<Student> filteredStudents = new ArrayList<>();
+        for (Student student : students) {
+            if (student.getAge() > 21 && student.getAge() < 23) {
+                filteredStudents.add(student);
+            }
+        }
+        return filteredStudents;
+    }
+	
+	//sort the students by their GPA
+	@GetMapping("/students/gpa")
+	public List<Student> getStudentsByGPA() {
+	    int n = students.size();
+	    for (int i = 0; i < n - 1; i++) {
+	        for (int j = 0; j < n - i - 1; j++) {
+	            if (students.get(j).getGpa() < students.get(j + 1).getGpa()) {
+	                // Swap students[j] and students[j+1]
+	                Student temp = students.get(j);
+	                students.set(j, students.get(j + 1));
+	                students.set(j + 1, temp);
+	            }
+	        }
+	    }
+	    return students;
 	}
-	//find the students who's age is between 20 and 23
-	//sort the students by their GP
+	
 	//create CRUD operations for students
 }
