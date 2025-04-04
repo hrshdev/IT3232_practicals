@@ -1,7 +1,7 @@
 package lk.ac.vau.fas.ict.controller;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,13 +24,13 @@ public class AppController {
 	Student Charly = new Student("2020ICT03", "Charly", 23, "BSc.IT", 3.67);
 	Student David = new Student("2020ICT04", "David", 22, "BSc.IT", 4.00);
 	
-	private static List<Student> students = new ArrayList<Student>();
+	private static Map<String, Student> mstudents = new HashMap<String, Student>();
 	
 	public AppController() {
-		students.add(Alice);
-		students.add(Bob);
-		students.add(Charly);
-		students.add(David);
+		mstudents.put(Alice.getRegNo(),Alice);
+		mstudents.put(Bob.getRegNo(),Bob);
+		mstudents.put(Charly.getRegNo(),Charly);
+		mstudents.put(David.getRegNo(),David);
 	}
 	
 	@GetMapping("/msg")
@@ -71,22 +71,21 @@ public class AppController {
 	
 	//return multiple students
 	@GetMapping("/students")
-	public List<Student> getStudents() {
-		return students;
+	public Map<String, Student> getStudents() {
+		return mstudents;
 	}
 	
 	//find a student from the list by regNo
 	@GetMapping("/students/{regN}")
 	public Student getStudentsByRegNo(@PathVariable("regN") String regNo) {
-		for(Student student : students) 
-		if(student.getRegNo().equals(regNo)) {
-			return student;
+		if (mstudents.containsKey(regNo)) {
+			return mstudents.get(regNo);
 		}
 		return null;
 	}
 	
 	//find the students who's age is between 20 and 23
-	@GetMapping("/students/age")
+	/*@GetMapping("/students/age")
     public List<Student> getStudentsByAge() {
         List<Student> filteredStudents = new ArrayList<>();
         for (Student student : students) {
@@ -112,37 +111,33 @@ public class AppController {
 	        }
 	    }
 	    return students;
-	}
+	}*/
 	
 	//create CRUD operations for students
 	//CRUD to add a student
-	@PostMapping("/students")
+	@PostMapping("/students/add")
     public String addStudent(@RequestBody Student student) {
-        students.add(student);
-        return "Student added successfully!";
+        mstudents.put(student.getRegNo(), student);
+        return "New Student added successfully!";
     }
 	
 	//CRUD to update a student's details
-	@PutMapping("/students/{regN}")
+	@PutMapping("/students/update/{regN}")
     public String updateStudent(@PathVariable("regN") String regNo, @RequestBody Student updatedStudent) {
-        for (int i = 0; i < students.size(); i++) {
-            if (students.get(i).getRegNo().equals(regNo)) {
-                students.set(i, updatedStudent);
-                return "Student details updated successfully!";
-            }
+        if (mstudents.containsKey(regNo)) {
+        	mstudents.put(regNo, updatedStudent);
+            return "Student Details Updated Successfully!";
         }
-        return "Student not found!";
+        return "Student Not Found!";
     }
 	
 	//CRUD to remove a student by registration number
-	@DeleteMapping("/students/{regN}")
+	@DeleteMapping("/students/remove/{regN}")
     public String deleteStudent(@PathVariable("regN") String regNo) {
-        for (int i = 0; i < students.size(); i++) {
-            if (students.get(i).getRegNo().equals(regNo)) {
-                students.remove(i);
-                return "Student removed successfully!";
-            }
+		if (mstudents.containsKey(regNo)) {
+        	mstudents.remove(regNo);
+            return "Student Details Deleted Successfully!";
         }
-        return "Student not found!";
+        return "Student Not Found!";
     }
 }
